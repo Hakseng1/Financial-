@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Ratio Analysis Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-btn.active {
+            border-bottom-color: #1D4ED8;
+            color: #1D4ED8;
+            font-weight: 600;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .analysis-good { color: #16A34A; }
+        .analysis-bad { color: #DC2626; }
+        .analysis-neutral { color: #6B7280; }
+        #ai-loader, #industry-loader, #chat-loader, #data-loader {
+            display: none;
+        }
+        .chat-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+        .user-bubble {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        .ai-bubble {
+            background-color: #F3F4F6;
+            color: #374151;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Financial Ratio Analysis Tool with ✨ AI Insights</h1>
+            <p class="mt-2 text-gray-600">Analyze a company's performance using key financial ratios and generate an AI-powered summary.</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- Tabs Navigation -->
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px" aria-label="Tabs">
+                    <button onclick="changeTab('instructions')" id="tab-btn-instructions" class="tab-btn active w-1/6 py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 hover:text-blue-700 hover:border-blue-300 transition-colors">
+                        Instructions
+                    </button>
+                    <button onclick="changeTab('data-input')" id="tab-btn-data-input" class="tab-btn w-1/6 py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 hover:text-blue-700 hover:border-blue-300 transition-colors">
+                        Data Input
+                    </button>
+                    <button onclick="changeTab('ratio-analysis')" id="tab-btn-ratio-analysis" class="tab-btn w-1/6 py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 hover:text-blue-700 hover:border-blue-300 transition-colors">
+                        Ratio Analysis
+                    </button>
+                    <button onclick="changeTab('industry-comparison')" id="tab-btn-industry-comparison" class="tab-btn w-1/6 py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 hover:text-blue-700 hover:border-blue-300 transition-colors">
+                        Industry Comparison
+                    </button>
+                    <button onclick="changeTab('ai-analysis')" id="tab-btn-ai-analysis" class="tab-btn w-1/6 py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 hover:text-blue-700 hover:border-blue-300 transition-colors">
+                        ✨ AI Analysis
+                    </button>
+                     <button onclick="changeTab('ai-chat')" id="tab-btn-ai-chat" class="tab-btn w-1/6 py-4 px-1 text-center border-b-2 font-medium text-sm text-gray-500 hover:text-blue-700 hover:border-blue-300 transition-colors">
+                        💬 Ask the Analyst
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Instructions Tab -->
+            <div id="instructions" class="tab-content active p-6 md:p-8">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">How to Use This Tool</h2>
+                <div class="space-y-4 text-gray-700">
+                    <p>This tool is designed to automate the financial analysis for your assignment. Follow these simple steps:</p>
+                    <ol class="list-decimal list-inside space-y-2 pl-4">
+                        <li><strong class="font-semibold">"Data Input" Tab:</strong> Start by entering the company's name. You can then fill the data manually or use the **AI-Powered Data Input** by uploading screenshots or a PDF of the financial statements.</li>
+                        <li><strong class="font-semibold">"Ratio Analysis" Tab:</strong> Automatically calculates the 13 financial ratios from your textbook.</li>
+                        <li><strong class="font-semibold">"Industry Comparison" Tab:</strong> You have three options:
+                            <ul class="list-disc list-inside ml-4 mt-2">
+                                <li>Use the default Beverage Industry data.</li>
+                                <li>Have the AI automatically find the correct industry benchmarks for your company.</li>
+                                <li>Manually enter your own benchmark data for a custom comparison.</li>
+                            </ul>
+                        </li>
+                        <li><strong class="font-semibold">"✨ AI Analysis" Tab:</strong> Generate a detailed summary for your assignment.</li>
+                        <li><strong class="font-semibold">"💬 Ask the Analyst" Tab:</strong> Chat with an AI financial expert to ask specific questions about your analysis.</li>
+                    </ol>
+                     <p class="mt-4 p-4 bg-blue-50 text-blue-800 border border-blue-200 rounded-lg text-sm">
+                        <strong>Important:</strong> To use the AI features, you must run this HTML file from a local server.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Data Input Tab -->
+            <div id="data-input" class="tab-content p-6 md:p-8">
+                 <div class="flex justify-between items-center mb-6">
+                    <h2 id="data-input-title" class="text-2xl font-semibold text-gray-800">Data Input for The Coca-Cola Company (2024)</h2>
+                 </div>
+
+                <!-- AI-Powered Data Input -->
+                 <div class="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2">✨ AI-Powered Data Input</h3>
+                    <p class="text-sm text-blue-700 mb-4">Upload one or more screenshots (or a PDF) of a company's financial statements to automatically fill the fields below.</p>
+                    <div class="flex items-center space-x-4">
+                        <input type="file" id="statement-upload" accept="image/*,application/pdf" multiple class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"/>
+                        <button onclick="extractDataFromFiles()" id="process-image-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:bg-gray-400">Process File(s)</button>
+                    </div>
+                     <div id="data-loader" class="mt-4 flex items-center space-x-3">
+                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span class="text-gray-600">Extracting financial data... This may take a moment.</span>
+                    </div>
+                    <div id="data-error" class="text-red-600 mt-2 text-sm"></div>
+                 </div>
+
+                 <div class="mb-6">
+                    <label for="companyName" class="block text-sm font-medium text-gray-700">Company Name</label>
+                    <input type="text" id="companyName" value="The Coca-Cola Company" oninput="runAnalysis()" class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white border">
+                 </div>
+                 <p class="text-sm text-gray-500 mb-6">Values should be in millions. The data for Coca-Cola is pre-filled as an example.</p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Income Statement Data -->
+                    <div>
+                        <h3 class="text-lg font-semibold border-b pb-2 mb-4 text-blue-700">Income Statement Data</h3>
+                        <div class="space-y-4">
+                            <div><label for="sales" class="block text-sm font-medium text-gray-700">Net Operating Revenues (Sales)</label><input type="number" id="sales" value="47061" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="netIncome" class="block text-sm font-medium text-gray-700">Net Income</label><input type="number" id="netIncome" value="10631" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="ebit" class="block text-sm font-medium text-gray-700">Operating Income (EBIT)</label><input type="number" id="ebit" value="9992" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="interestExpense" class="block text-sm font-medium text-gray-700">Interest Expense</label><input type="number" id="interestExpense" value="1656" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="leasePayments" class="block text-sm font-medium text-gray-700">Lease Payments</label><input type="number" id="leasePayments" value="362" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"><p class="text-xs text-gray-500 mt-1">From Note 10 (Operating Lease Costs).</p></div>
+                        </div>
+                    </div>
+                    <!-- Balance Sheet Data -->
+                    <div>
+                        <h3 class="text-lg font-semibold border-b pb-2 mb-4 text-blue-700">Balance Sheet Data</h3>
+                        <div class="space-y-4">
+                            <div><label for="currentAssets" class="block text-sm font-medium text-gray-700">Total Current Assets</label><input type="number" id="currentAssets" value="25997" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="inventory" class="block text-sm font-medium text-gray-700">Inventories</label><input type="number" id="inventory" value="4728" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="accountsReceivable" class="block text-sm font-medium text-gray-700">Trade Accounts Receivable</label><input type="number" id="accountsReceivable" value="3569" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="fixedAssets" class="block text-sm font-medium text-gray-700">Net Plant and Equipment (Fixed Assets)</label><input type="number" id="fixedAssets" value="10303" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="totalAssets" class="block text-sm font-medium text-gray-700">Total Assets</label><input type="number" id="totalAssets" value="100549" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="currentLiabilities" class="block text-sm font-medium text-gray-700">Total Current Liabilities</label><input type="number" id="currentLiabilities" value="25249" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                            <div><label for="totalDebt" class="block text-sm font-medium text-gray-700">Total Liabilities (Total Debt)</label><input type="number" id="totalDebt" value="71708" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"><p class="text-xs text-gray-500 mt-1">Sum of Current Liabilities, Long-term Debt, Other noncurrent liabilities, and Deferred income tax liabilities.</p></div>
+                            <div><label for="equity" class="block text-sm font-medium text-gray-700">Stockholders' Equity</label><input type="number" id="equity" value="24856" oninput="runAnalysis()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-gray-50"></div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- Ratio Analysis Tab -->
+            <div id="ratio-analysis" class="tab-content p-4 md:p-6">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 px-2 md:px-0">Ratio Analysis Results</h2>
+                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ratio Name</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Formula</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th></tr></thead><tbody id="ratio-table-body" class="bg-white divide-y divide-gray-200"></tbody></table></div>
+            </div>
+
+            <!-- Industry Comparison Tab -->
+            <div id="industry-comparison" class="tab-content p-4 md:p-6">
+                <h2 id="comparison-title" class="text-2xl font-semibold mb-2 text-gray-800 px-2 md:px-0">Industry Comparison</h2>
+                <p id="comparison-subtitle" class="text-sm text-gray-500 mb-6 px-2 md:px-0">Comparing The Coca-Cola Company (2024) to Beverage Industry Averages.</p>
+                
+                <div class="mb-6 p-4 border border-gray-200 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Update Benchmarks</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="industryNameInput" class="block text-sm font-medium text-gray-700">Option 1: Enter Industry Name (for AI)</label>
+                            <input type="text" id="industryNameInput" oninput="handleIndustryInputChange()" class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white border" placeholder="e.g., Automotive or leave blank for auto-detect">
+                        </div>
+                        <button id="update-industry-btn" onclick="updateIndustryAverages()" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors shadow-sm disabled:bg-gray-400">
+                            ✨ Update with AI
+                        </button>
+                         <div id="industry-loader" class="mt-4 flex items-center space-x-3">
+                            <svg class="animate-spin h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span class="text-gray-600">Fetching latest industry data...</span>
+                        </div>
+                        <div id="industry-error" class="text-red-600 mt-2 text-sm"></div>
+                        <div id="industry-update-prompt" class="mt-4 p-3 bg-yellow-50 text-yellow-800 text-sm rounded-md border border-yellow-200"></div>
+                    </div>
+                </div>
+
+                <div class="mb-8 p-6 bg-gray-50 border border-gray-200 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Option 2: Manual Input</h3>
+                    <p class="text-sm text-gray-600 mb-4">Enter your own benchmark data below for a custom comparison.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="manual-inputs">
+                        <!-- Manual inputs will be generated here by JS -->
+                    </div>
+                    <button onclick="applyManualAverages()" class="mt-4 bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-800 transition-colors shadow-sm">Apply Manual Averages</button>
+                </div>
+
+                <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ratio Name</th><th id="comparison-header" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coca-Cola's Result</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry Average</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Analysis</th></tr></thead><tbody id="comparison-table-body" class="bg-white divide-y divide-gray-200"></tbody></table></div>
+            </div>
+            
+            <!-- AI Analysis Tab -->
+            <div id="ai-analysis" class="tab-content p-6 md:p-8">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">✨ AI Analysis & Insights</h2>
+                <p class="text-gray-600 mb-6">Click the button below to generate a detailed, point-by-point AI analysis of the company's financial health. This uses the Gemini API with Google Search for up-to-date context.</p>
+                <button id="generate-ai-btn" onclick="generateAIAnalysis()" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-sm disabled:bg-blue-300">
+                    Generate Detailed Analysis
+                </button>
+                <div id="ai-loader" class="mt-6 flex items-center space-x-3">
+                    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="text-gray-600">Generating insights... This may take a moment.</span>
+                </div>
+                <div id="ai-result-container" class="mt-6 prose max-w-none prose-blue"></div>
+            </div>
+
+             <!-- AI Chat Tab -->
+            <div id="ai-chat" class="tab-content p-6 md:p-8">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">💬 Ask the Analyst</h2>
+                <p class="text-gray-600 mb-6">Ask a question about the financial analysis to get an instant explanation from the AI.</p>
+                <div id="chat-window" class="h-96 border rounded-lg p-4 overflow-y-auto bg-gray-50 flex flex-col space-y-4">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div id="chat-loader" class="mt-4 flex items-center space-x-3">
+                    <svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span class="text-gray-500">The analyst is thinking...</span>
+                </div>
+                <div class="mt-4 flex">
+                    <input type="text" id="chat-input" class="flex-grow rounded-l-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border" placeholder="e.g., Explain the ROE in simpler terms...">
+                    <button onclick="askAnalyst()" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-r-lg hover:bg-blue-700 transition-colors shadow-sm">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ratioData = [ { category: 'A. Profitability Ratios' }, { name: '1. Profit Margin', id: 'profitMargin', higherIsBetter: true }, { name: '2. Return on Assets (ROA)', id: 'roa', higherIsBetter: true }, { name: '3. Return on Equity (ROE)', id: 'roe', higherIsBetter: true }, { category: 'B. Asset Utilization Ratios' }, { name: '4. Receivable Turnover', id: 'receivableTurnover', higherIsBetter: true }, { name: '5. Average Collection Period', id: 'avgCollectionPeriod', higherIsBetter: false }, { name: '6. Inventory Turnover', id: 'inventoryTurnover', higherIsBetter: true }, { name: '7. Fixed Asset Turnover', id: 'fixedAssetTurnover', higherIsBetter: true }, { name: '8. Total Asset Turnover', id: 'totalAssetTurnover', higherIsBetter: true }, { category: 'C. Liquidity Ratios' }, { name: '9. Current Ratio', id: 'currentRatio', higherIsBetter: true }, { name: '10. Quick Ratio', id: 'quickRatio', higherIsBetter: true }, { category: 'D. Debt Utilization Ratios' }, { name: '11. Debt to Total Assets', id: 'debtToAssets', higherIsBetter: false }, { name: '12. Times Interest Earned', id: 'timesInterestEarned', higherIsBetter: true }, { name: '13. Fixed Charge Coverage', id: 'fixedChargeCoverage', higherIsBetter: true }, ];
+        let industryAverages = { profitMargin: 8.5, roa: 7.0, roe: 25.0, receivableTurnover: 10.0, avgCollectionPeriod: 36.5, inventoryTurnover: 8.0, fixedAssetTurnover: 3.0, totalAssetTurnover: 0.8, currentRatio: 0.9, quickRatio: 0.6, debtToAssets: 58.0, timesInterestEarned: 7.5, fixedChargeCoverage: 6.0, };
+        let companyResults = {};
+        let currentIndustryName = 'Beverage Industry';
+        let companyNameForAverages = 'The Coca-Cola Company';
+        let chatHistory = [];
+        
+        function getValues() { return { sales: parseFloat(document.getElementById('sales').value) || 0, netIncome: parseFloat(document.getElementById('netIncome').value) || 0, ebit: parseFloat(document.getElementById('ebit').value) || 0, interestExpense: parseFloat(document.getElementById('interestExpense').value) || 0, leasePayments: parseFloat(document.getElementById('leasePayments').value) || 0, currentAssets: parseFloat(document.getElementById('currentAssets').value) || 0, inventory: parseFloat(document.getElementById('inventory').value) || 0, accountsReceivable: parseFloat(document.getElementById('accountsReceivable').value) || 0, fixedAssets: parseFloat(document.getElementById('fixedAssets').value) || 0, totalAssets: parseFloat(document.getElementById('totalAssets').value) || 0, currentLiabilities: parseFloat(document.getElementById('currentLiabilities').value) || 0, totalDebt: parseFloat(document.getElementById('totalDebt').value) || 0, equity: parseFloat(document.getElementById('equity').value) || 0, companyName: document.getElementById('companyName').value || 'The Company', }; }
+        function calculateRatios() { const data = getValues(); const results = {}; results.profitMargin = data.sales ? (data.netIncome / data.sales) * 100 : 0; results.roa = data.totalAssets ? (data.netIncome / data.totalAssets) * 100 : 0; results.roe = data.equity ? (data.netIncome / data.equity) * 100 : 0; results.receivableTurnover = data.accountsReceivable ? data.sales / data.accountsReceivable : 0; results.avgCollectionPeriod = data.sales ? data.accountsReceivable / (data.sales / 365) : 0; results.inventoryTurnover = data.inventory ? data.sales / data.inventory : 0; results.fixedAssetTurnover = data.fixedAssets ? data.sales / data.fixedAssets : 0; results.totalAssetTurnover = data.totalAssets ? data.sales / data.totalAssets : 0; results.currentRatio = data.currentLiabilities ? data.currentAssets / data.currentLiabilities : 0; results.quickRatio = data.currentLiabilities ? (data.currentAssets - data.inventory) / data.currentLiabilities : 0; results.debtToAssets = data.totalAssets ? (data.totalDebt / data.totalAssets) * 100 : 0; results.timesInterestEarned = data.interestExpense ? data.ebit / data.interestExpense : 0; const fixedCharges = data.interestExpense + data.leasePayments; results.fixedChargeCoverage = fixedCharges ? (data.ebit + data.leasePayments) / fixedCharges : 0; return results; }
+        function formatResult(value, id) { if (isNaN(value) || !isFinite(value)) { return 'N/A'; } if (['profitMargin', 'roa', 'roe', 'debtToAssets'].includes(id)) { return `${value.toFixed(2)}%`; } else if (id === 'avgCollectionPeriod') { return `${value.toFixed(2)} days`; } else { return `${value.toFixed(2)}x`; } }
+        function displayRatioResults(results) { const tableBody = document.getElementById('ratio-table-body'); tableBody.innerHTML = ''; ratioData.forEach(item => { if (item.category) { const row = document.createElement('tr'); row.innerHTML = `<td colspan="3" class="px-6 py-3 bg-blue-50 text-sm font-semibold text-blue-800">${item.category}</td>`; tableBody.appendChild(row); } else { const ratioDetails = getRatioFormula(item.name); const formattedResult = formatResult(results[item.id], item.id); const row = document.createElement('tr'); row.className = 'hover:bg-gray-50'; row.innerHTML = ` <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td> <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${ratioDetails.formula}</td> <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">${formattedResult}</td> `; tableBody.appendChild(row); } }); }
+        function getRatioFormula(name) { const ratio = ratioData.find(r => r.name === name); return ratio ? { formula: ratio.formula } : { formula: 'N/A' }; }
+        function displayComparisonResults(results) { const tableBody = document.getElementById('comparison-table-body'); tableBody.innerHTML = ''; const companyName = getValues().companyName; document.getElementById('comparison-header').textContent = `${companyName}'s Result`; ratioData.forEach(item => { if (item.category) { const row = document.createElement('tr'); row.innerHTML = `<td colspan="4" class="px-6 py-3 bg-blue-50 text-sm font-semibold text-blue-800">${item.category}</td>`; tableBody.appendChild(row); } else { const companyValue = results[item.id]; const industryValue = industryAverages[item.id]; let analysisText = ''; let analysisClass = 'analysis-neutral'; if (!isNaN(companyValue) && isFinite(companyValue)) { if (item.higherIsBetter) { if (companyValue > industryValue * 1.05) { analysisText = 'Above Average'; analysisClass = 'analysis-good'; } else if (companyValue < industryValue * 0.95) { analysisText = 'Below Average'; analysisClass = 'analysis-bad'; } else { analysisText = 'Average'; } } else { if (companyValue < industryValue * 0.95) { analysisText = 'Better than Average'; analysisClass = 'analysis-good'; } else if (companyValue > industryValue * 1.05) { analysisText = 'Worse than Average'; analysisClass = 'analysis-bad'; } else { analysisText = 'Average'; } } } const row = document.createElement('tr'); row.className = 'hover:bg-gray-50'; row.innerHTML = ` <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td> <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">${formatResult(companyValue, item.id)}</td> <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatResult(industryValue, item.id)}</td> <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${analysisClass}">${analysisText}</td> `; tableBody.appendChild(row); } }); }
+        
+        async function extractDataFromFiles() {
+            const fileInput = document.getElementById('statement-upload');
+            const files = fileInput.files;
+            if (files.length === 0) {
+                document.getElementById('data-error').textContent = 'Please select one or more files first.';
+                return;
+            }
+
+            const loader = document.getElementById('data-loader');
+            const errorDiv = document.getElementById('data-error');
+            const btn = document.getElementById('process-image-btn');
+            
+            loader.style.display = 'flex';
+            errorDiv.textContent = '';
+            btn.disabled = true;
+
+            const filePromises = Array.from(files).map(file => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve({
+                        mimeType: file.type,
+                        data: reader.result.split(',')[1]
+                    });
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            try {
+                const fileData = await Promise.all(filePromises);
+                const imageParts = fileData.map(file => ({
+                    inline_data: {
+                        mime_type: file.mimeType,
+                        data: file.data
+                    }
+                }));
+
+                const prompt = "Analyze these financial statement images (or pages from a PDF) and extract the following values in millions. Look across all images to find the data. If a value is not present, use null. Sanitize the numbers by removing commas, dollar signs, and parentheses for negatives.";
+                
+                const schema = {
+                    type: "OBJECT",
+                    properties: {
+                        "companyName": { "type": "STRING" }, "sales": { "type": "NUMBER" }, "netIncome": { "type": "NUMBER" }, "ebit": { "type": "NUMBER" }, "interestExpense": { "type": "NUMBER" }, "currentAssets": { "type": "NUMBER" }, "inventory": { "type": "NUMBER" }, "accountsReceivable": { "type": "NUMBER" }, "fixedAssets": { "type": "NUMBER" }, "totalAssets": { "type": "NUMBER" }, "currentLiabilities": { "type": "NUMBER" }, "totalDebt": { "type": "NUMBER" }, "equity": { "type": "NUMBER" }
+                    }
+                };
+                const apiKey = "AIzaSyB4EazOZ0SmKItqiaea4sMMnOueB_wQq7c";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{
+                        parts: [ { text: prompt }, ...imageParts ]
+                    }],
+                    generationConfig: { responseMimeType: "application/json", responseSchema: schema }
+                };
+
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                const result = await response.json();
+                const extractedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (extractedText) {
+                    const data = JSON.parse(extractedText);
+                    Object.keys(data).forEach(key => {
+                        const element = document.getElementById(key);
+                        if (element && data[key] !== null) {
+                            element.value = data[key];
+                        }
+                    });
+                    runAnalysis(); 
+                } else {
+                    throw new Error("Could not extract data from the image.");
+                }
+            } catch (error) {
+                console.error('Error extracting data:', error);
+                errorDiv.textContent = 'Failed to extract data. Please ensure the image is clear and try again.';
+            } finally {
+                loader.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+
+        async function generateAIAnalysis() {
+            const btn = document.getElementById('generate-ai-btn');
+            const loader = document.getElementById('ai-loader');
+            const resultContainer = document.getElementById('ai-result-container');
+            const companyName = getValues().companyName;
+
+            btn.disabled = true;
+            loader.style.display = 'flex';
+            resultContainer.innerHTML = '';
+
+            const systemPrompt = "You are a helpful financial analyst providing insights from a financial management perspective. Your task is to provide a detailed, insightful analysis of a company's financial performance for a student's assignment, focusing on what the numbers mean for strategic decision-making. First, for each of the 13 financial ratios provided, explain what the ratio means and what the company's specific result indicates about its performance, especially in comparison to the industry average. Structure this part with clear headings for each of the four ratio categories (Profitability, Asset Utilization, Liquidity, Debt Utilization). Second, add a new section with the heading 'Future Outlook & Forecasting'. In this section, based on the ratio analysis and up-to-date information from Google Search, discuss the company's potential future performance. Mention key opportunities for growth and potential risks the company might face. Provide a brief, high-level forecast. Finally, provide a concluding 'Overall Summary' paragraph that synthesizes all the findings, states the company's overall financial health from a management perspective, and gives a final strategic outlook.";
+            
+            let userQuery = `Please provide a detailed, point-by-point financial analysis for ${companyName} for the year 2024. Here is the data:\n\n`;
+            const comparisonTable = document.getElementById('comparison-table-body').rows;
+            for (let i = 0; i < comparisonTable.length; i++) { const row = comparisonTable[i]; if (row.cells.length > 1) { const ratioName = row.cells[0].innerText; const companyResult = row.cells[1].innerText; const industryAvg = row.cells[2].innerText; const analysis = row.cells[3].innerText; userQuery += `- ${ratioName}: ${companyResult} (Industry Average: ${industryAvg}) - Analysis: ${analysis}\n`; } }
+
+            const apiKey = "AIzaSyB4EazOZ0SmKItqiaea4sMMnOueB_wQq7c";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }], tools: [{ "google_search": {} }], systemInstruction: { parts: [{ text: systemPrompt }] }, };
+
+            try { 
+                let response; let retries = 5; let delay = 2000; 
+                for (let i = 0; i < retries; i++) { 
+                    response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); 
+                    if (response.ok) break; 
+                    if (response.status === 429 || response.status >= 500) { 
+                        await new Promise(resolve => setTimeout(resolve, delay)); 
+                        delay *= 2; 
+                    } else { 
+                        break; 
+                    } 
+                } 
+                if (!response.ok) { 
+                    let errorText = `API call failed with status: ${response.status}`;
+                    if(response.status === 429) errorText += ". The server is busy, please try again in a few moments.";
+                    throw new Error(errorText); 
+                } 
+                const result = await response.json(); 
+                const candidate = result.candidates?.[0]; 
+                if (candidate && candidate.content?.parts?.[0]?.text) { 
+                    const text = candidate.content.parts[0].text; 
+                    let sources = []; 
+                    const groundingMetadata = candidate.groundingMetadata; 
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) { 
+                        sources = groundingMetadata.groundingAttributions.map(attr => ({ uri: attr.web?.uri, title: attr.web?.title })).filter(source => source.uri && source.title); 
+                    } 
+                    let htmlOutput = text.replace(/(\*\*|__)(.*?)\1/g, '<h3>$2</h3>').replace(/\n/g, '<br>'); 
+                    if (sources.length > 0) { 
+                        htmlOutput += `<h3 class="mt-6 text-lg font-semibold">Sources:</h3><ul class="list-disc pl-5">`; 
+                        sources.forEach(source => { htmlOutput += `<li><a href="${source.uri}" target="_blank" class="text-blue-600 hover:underline">${source.title}</a></li>`; }); 
+                        htmlOutput += `</ul>`; 
+                    } 
+                    resultContainer.innerHTML = htmlOutput; 
+                } else { 
+                    resultContainer.innerHTML = `<p class="text-red-600">Sorry, the AI analysis could not be generated. The model did not return a valid response.</p><p class="text-xs text-gray-500 mt-2">${JSON.stringify(result)}</p>`; 
+                } 
+            } catch (error) { 
+                console.error("Error calling Gemini API:", error); 
+                resultContainer.innerHTML = `<p class="text-red-600">An error occurred while generating the analysis: ${error.message}</p>`; 
+            } finally { 
+                loader.style.display = 'none'; 
+                btn.disabled = false; 
+            }
+        }
+
+        async function updateIndustryAverages() {
+            const btn = document.getElementById('update-industry-btn');
+            const loader = document.getElementById('industry-loader');
+            const errorDiv = document.getElementById('industry-error');
+            const companyName = getValues().companyName;
+            const manualIndustry = document.getElementById('industryNameInput').value.trim();
+
+            btn.disabled = true;
+            loader.style.display = 'flex';
+            errorDiv.textContent = '';
+            
+            let userQuery;
+            if(manualIndustry){
+                 userQuery = `Find the most recent industry average financial ratios AND the industry name AND the source name AND the source URL for the data for the "${manualIndustry}" industry. The ratios are: profitMargin, roa, roe, receivableTurnover, avgCollectionPeriod, inventoryTurnover, fixedAssetTurnover, totalAssetTurnover, currentRatio, quickRatio, debtToAssets, timesInterestEarned, fixedChargeCoverage.`;
+            } else {
+                 userQuery = `Find the most recent industry average financial ratios AND the industry name AND the source name AND the source URL for the data for the primary industry of ${companyName}. The ratios are: profitMargin, roa, roe, receivableTurnover, avgCollectionPeriod, inventoryTurnover, fixedAssetTurnover, totalAssetTurnover, currentRatio, quickRatio, debtToAssets, timesInterestEarned, fixedChargeCoverage.`;
+            }
+
+            const schema = { type: "OBJECT", properties: { "industryName": { "type": "STRING" }, "dataSource": { "type": "STRING" }, "dataSourceURL": { "type": "STRING"}, "ratios": { type: "OBJECT", properties: { "profitMargin": { "type": "NUMBER" }, "roa": { "type": "NUMBER" }, "roe": { "type": "NUMBER" }, "receivableTurnover": { "type": "NUMBER" }, "avgCollectionPeriod": { "type": "NUMBER" }, "inventoryTurnover": { "type": "NUMBER" }, "fixedAssetTurnover": { "type": "NUMBER" }, "totalAssetTurnover": { "type": "NUMBER" }, "currentRatio": { "type": "NUMBER" }, "quickRatio": { "type": "NUMBER" }, "debtToAssets": { "type": "NUMBER" }, "timesInterestEarned": { "type": "NUMBER" }, "fixedChargeCoverage": { "type": "NUMBER" } } } } };
+            const apiKey = "AIzaSyB4EazOZ0SmKItqiaea4sMMnOueB_wQq7c";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
+
+            try {
+                let response; let retries = 5; let delay = 2000; 
+                for (let i = 0; i < retries; i++) { 
+                    response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); 
+                    if (response.ok) break; 
+                    if (response.status === 429 || response.status >= 500) { 
+                        await new Promise(resolve => setTimeout(resolve, delay)); 
+                        delay *= 2; 
+                    } else { 
+                        break; 
+                    } 
+                }
+                if (!response.ok) { 
+                    let errorText = `API call failed with status: ${response.status}`;
+                    if(response.status === 429) errorText += ". The server is busy, please try again in a few moments.";
+                    throw new Error(errorText); 
+                }
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const parsedJson = JSON.parse(candidate.content.parts[0].text);
+                    industryAverages = parsedJson.ratios;
+                    currentIndustryName = parsedJson.industryName || 'the identified industry';
+                    const dataSource = parsedJson.dataSource || 'various public sources';
+                    const dataSourceURL = parsedJson.dataSourceURL;
+                    companyNameForAverages = companyName; 
+                    runAnalysis(dataSource, dataSourceURL); 
+                } else {
+                    throw new Error("Invalid JSON response from API.");
+                }
+            } catch(error) {
+                console.error("Error updating industry averages:", error);
+                errorDiv.textContent = `Could not fetch industry averages: ${error.message}`;
+                btn.disabled = false;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+        
+        function applyManualAverages() {
+            const manualInputs = document.querySelectorAll('#manual-inputs input');
+            let allEmpty = true;
+            manualInputs.forEach(input => {
+                const value = parseFloat(input.value);
+                const id = input.id.replace('manual_', '');
+                if (!isNaN(value)) {
+                    industryAverages[id] = value;
+                    allEmpty = false;
+                }
+            });
+
+            if(!allEmpty){
+                currentIndustryName = 'Manually Entered Data';
+                companyNameForAverages = "manual"; // Prevents re-enabling AI button
+                runAnalysis('Manual Input');
+            }
+        }
+
+        function runAnalysis(dataSource = null, dataSourceURL = null) {
+            companyResults = calculateRatios();
+            const companyName = getValues().companyName;
+            
+            document.getElementById('data-input-title').textContent = `Data Input for ${companyName} (2024)`;
+            document.getElementById('comparison-title').textContent = `Industry Comparison`;
+            
+            displayRatioResults(companyResults);
+            
+            const updateBtn = document.getElementById('update-industry-btn');
+            const updatePrompt = document.getElementById('industry-update-prompt');
+            const industryInput = document.getElementById('industryNameInput').value.trim();
+
+            if ((companyName.toLowerCase() === companyNameForAverages.toLowerCase() && !industryInput) || (industryInput && industryInput.toLowerCase() === currentIndustryName.toLowerCase()) || companyNameForAverages === "manual" ) {
+                updateBtn.disabled = true;
+                let promptText = `Averages for the <strong class="font-semibold">${currentIndustryName}</strong> are being used.`;
+                if(dataSource && dataSourceURL) {
+                    promptText += ` (Source: <a href="${dataSourceURL}" target="_blank" class="text-blue-600 hover:underline">${dataSource}</a>).`;
+                } else if (dataSource) {
+                     promptText += ` (Source: ${dataSource}).`;
+                }
+                 promptText += ' Change the company or industry name to fetch new data.';
+                updatePrompt.innerHTML = promptText;
+                updatePrompt.style.display = 'block';
+            } else {
+                updateBtn.disabled = false;
+                updatePrompt.innerHTML = `The current industry averages are for the <strong class="font-semibold">${currentIndustryName}</strong>. To get a more accurate comparison, click the "Update Industry Averages with AI" button.`;
+                updatePrompt.style.display = 'block';
+            }
+
+            document.getElementById('comparison-subtitle').textContent = `Comparing ${companyName} (2024) to the ${currentIndustryName} average.`;
+            displayComparisonResults(companyResults);
+
+
+            const aiResultContainer = document.getElementById('ai-result-container');
+            if(aiResultContainer.innerHTML !== '') {
+                aiResultContainer.innerHTML = '<p class="text-sm text-yellow-700 bg-yellow-50 p-3 rounded-md">Input data or company name has changed. Please regenerate the AI analysis for the updated results.</p>';
+            }
+        }
+
+        function handleIndustryInputChange(){
+             document.getElementById('update-industry-btn').disabled = false;
+             document.getElementById('industry-update-prompt').innerHTML = `Click the "Update" button to fetch data for the new industry you entered.`;
+        }
+
+        async function askAnalyst() {
+            const input = document.getElementById('chat-input');
+            const question = input.value.trim();
+            if (!question) return;
+
+            const chatWindow = document.getElementById('chat-window');
+            const chatLoader = document.getElementById('chat-loader');
+            
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble user-bubble';
+            userBubble.textContent = question;
+            chatWindow.appendChild(userBubble);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            input.value = '';
+
+            chatLoader.style.display = 'flex';
+
+            const companyName = getValues().companyName;
+            let financialContext = `Here is the current financial ratio analysis for ${companyName}:\n`;
+            for (const key in companyResults) { const ratioInfo = ratioData.find(r => r.id === key); if(ratioInfo) { financialContext += `- ${ratioInfo.name}: ${formatResult(companyResults[key], key)}\n`; } }
+
+            const systemPrompt = `You are a helpful AI financial analyst and tutor. Your role is to answer questions about a company's financial performance based on the provided ratio analysis. Use the context of the financial data to give clear, concise, and educational answers. Do not repeat the full analysis unless asked. Focus directly on the user's question.`;
+
+            let currentChatHistory = [...chatHistory, {role: "user", parts: [{text: financialContext + "\n\nMy question is: " + question}]}];
+
+            const apiKey = "AIzaSyB4EazOZ0SmKItqiaea4sMMnOueB_wQq7c";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = { contents: currentChatHistory, systemInstruction: { parts: [{ text: systemPrompt }] }, };
+
+            try {
+                let response; let retries = 5; let delay = 2000; 
+                for (let i = 0; i < retries; i++) { 
+                    response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); 
+                    if (response.ok) break; 
+                    if (response.status === 429 || response.status >= 500) { 
+                        await new Promise(resolve => setTimeout(resolve, delay)); 
+                        delay *= 2; 
+                    } else { 
+                        break; 
+                    } 
+                }
+                if (!response.ok) { 
+                    let errorText = `API call failed with status: ${response.status}`;
+                    if(response.status === 429) errorText += ". The server is busy, please try again in a few moments.";
+                    throw new Error(errorText); 
+                }
+                const result = await response.json();
+                const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (aiResponse) {
+                    const aiBubble = document.createElement('div');
+                    aiBubble.className = 'chat-bubble ai-bubble';
+                    aiBubble.textContent = aiResponse;
+                    chatWindow.appendChild(aiBubble);
+
+                    chatHistory.push({role: "user", parts: [{text: question}]});
+                    chatHistory.push({role: "model", parts: [{text: aiResponse}]});
+
+                } else {
+                     throw new Error("No response text from API.");
+                }
+            } catch(error) {
+                console.error("Chat error:", error);
+                const errorBubble = document.createElement('div');
+                errorBubble.className = 'chat-bubble ai-bubble';
+                errorBubble.innerHTML = `<span class="text-red-500">Sorry, I couldn't get a response: ${error.message}</span>`;
+                chatWindow.appendChild(errorBubble);
+            } finally {
+                chatLoader.style.display = 'none';
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        }
+        
+        function changeTab(tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            document.getElementById('tab-btn-' + tabName).classList.add('active');
+        }
+        
+        window.onload = function() {
+            const manualInputsContainer = document.getElementById('manual-inputs');
+            ratioData.forEach(item => {
+                if (item.id) {
+                    let labelText = item.name.substring(item.name.indexOf(' ') + 1);
+                    if (['profitMargin', 'roa', 'roe', 'debtToAssets'].includes(item.id)) {
+                        labelText += ' (%)';
+                    }
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <label for="manual_${item.id}" class="block text-sm font-medium text-gray-700">${labelText}</label>
+                        <input type="number" id="manual_${item.id}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 bg-white border">
+                    `;
+                    manualInputsContainer.appendChild(div);
+                }
+            });
+            runAnalysis();
+            changeTab('instructions');
+            document.getElementById('chat-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    askAnalyst();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
+
